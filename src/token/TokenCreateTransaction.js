@@ -80,6 +80,7 @@ export default class TokenCreateTransaction extends Transaction {
      * @param {TokenType} [props.tokenType]
      * @param {TokenSupplyType} [props.supplyType]
      * @param {Long | number} [props.maxSupply]
+     * @param {Key} [props.metadataKey]
      */
     constructor(props = {}) {
         super();
@@ -212,6 +213,12 @@ export default class TokenCreateTransaction extends Transaction {
 
         this._defaultMaxTransactionFee = new Hbar(30);
 
+        /**
+         * @private
+         * @type {?Key}
+         */
+        this._metadataKey = null;
+
         if (props.tokenName != null) {
             this.setTokenName(props.tokenName);
         }
@@ -294,6 +301,10 @@ export default class TokenCreateTransaction extends Transaction {
 
         if (props.maxSupply != null) {
             this.setMaxSupply(props.maxSupply);
+        }
+
+        if (props.metadataKey != null) {
+            this.setMetadataKey(props.metadataKey);
         }
     }
 
@@ -399,6 +410,10 @@ export default class TokenCreateTransaction extends Transaction {
                         : undefined,
                 maxSupply:
                     create.maxSupply != null ? create.maxSupply : undefined,
+                metadataKey:
+                    create.metadataKey != null
+                        ? Key._fromProtobufKey(create.metadataKey)
+                        : undefined,
             }),
             transactions,
             signedTransactions,
@@ -792,6 +807,24 @@ export default class TokenCreateTransaction extends Transaction {
     }
 
     /**
+     * @returns {?Key}
+     */
+    get metadataKey() {
+        return this._metadataKey;
+    }
+
+    /**
+     * @param {Key} key
+     * @returns {this}
+     */
+    setMetadataKey(key) {
+        this._requireNotFrozen();
+        this._metadataKey = key;
+
+        return this;
+    }
+
+    /**
      * @override
      * @param {AccountId} accountId
      */
@@ -901,6 +934,10 @@ export default class TokenCreateTransaction extends Transaction {
             supplyType:
                 this._supplyType != null ? this._supplyType._code : null,
             maxSupply: this.maxSupply,
+            metadataKey:
+                this._metadataKey != null
+                    ? this._metadataKey._toProtobufKey()
+                    : null,
         };
     }
 
