@@ -22,6 +22,8 @@ describe("TokenCreate", function () {
         const key2 = PrivateKey.generateED25519();
         const key3 = PrivateKey.generateED25519();
         const key4 = PrivateKey.generateED25519();
+        const metadataKey = PrivateKey.generateED25519();
+        const metadata = new Uint8Array(1);
 
         const response = await new TokenCreateTransaction()
             .setTokenName("ffff")
@@ -35,6 +37,8 @@ describe("TokenCreate", function () {
             .setWipeKey(key3)
             .setSupplyKey(key4)
             .setFreezeDefault(false)
+            .setMetadataKey(metadataKey)
+            .setMetadata(metadata)
             .execute(env.client);
 
         const tokenId = (await response.getReceipt(env.client)).tokenId;
@@ -66,6 +70,8 @@ describe("TokenCreate", function () {
         expect(info.autoRenewPeriod).to.be.not.null;
         expect(info.autoRenewPeriod.seconds.toInt()).to.be.eql(7776000);
         expect(info.expirationTime).to.be.not.null;
+        expect(info.metadataKey).to.eql(metadataKey.toString());
+        expect(info.metadata).to.eql(metadata);
     });
 
     it("should be executable with minimal properties set", async function () {
